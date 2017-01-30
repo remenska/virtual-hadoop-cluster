@@ -25,6 +25,18 @@ service cloudera-scm-server-db start
 service cloudera-scm-server start
 SCRIPT
 
+$slave1_script = <<SCRIPT
+apt-get install -y openjdk-7-jdk
+apt-get install -y openjdk-7-jre
+apt-get install -y curl
+wget https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.4.4.deb
+dpkg -i elasticsearch-2.4.4.deb
+cp /vagrant/files/etc/elasticsearch/elasticsearch.yml /etc/elasticsearch
+cp /vagrant/files/elasticsearch-hadoop-mr-2.4.4.jar .
+update-rc.d elasticsearch defaults
+service elasticsearch start
+SCRIPT
+
 $hosts_script = <<SCRIPT
 cat > /etc/hosts <<EOF
 127.0.0.1       localhost
@@ -70,8 +82,10 @@ Vagrant.configure("2") do |config|
       v.customize ["modifyvm", :id, "--memory", "2048"]
     end
     slave1.vm.network :private_network, ip: "10.211.55.101"
+    slave1.vm.network :forwarded_port, guest: 9200, host: 9200      # elasticsearch
     slave1.vm.hostname = "vm-cluster-node2"
     slave1.vm.provision :shell, :inline => $hosts_script
+    slave1.vm.provision :shell, :inline => $slave1_script
     slave1.vm.provision :hostmanager
   end
 
