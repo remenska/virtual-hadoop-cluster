@@ -20,18 +20,16 @@ fi
 apt-get update
 export DEBIAN_FRONTEND=noninteractive
 apt-get -q -y --force-yes install oracle-j2sdk1.7 cloudera-manager-server-db cloudera-manager-server cloudera-manager-daemons
-mkdir /var/lib/oozie/libext
-chown -R oozie:oozie /var/lib/oozie/libext
-cp /vagrant/files/ext-2.2.zip /var/lib/oozie/libext
-chown oozie:oozie /var/lib/oozie/libext/ext-2.2.zip
 service cloudera-scm-server-db initdb
 service cloudera-scm-server-db start
 service cloudera-scm-server start
 SCRIPT
 
 $slave1_script = <<SCRIPT
-apt-get install -y openjdk-7-jdk
+add-apt-repository ppa:openjdk-r/ppa
+apt-get update
 apt-get install -y openjdk-7-jre
+apt-get install -y openjdk-7-jdk
 apt-get install -y curl
 wget https://download.elastic.co/elasticsearch/elasticsearch/elasticsearch-2.4.4.deb
 dpkg -i elasticsearch-2.4.4.deb
